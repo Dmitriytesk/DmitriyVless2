@@ -63,12 +63,15 @@ conn = sqlite3.connect("users.db", check_same_thread=False)
 cur = conn.cursor()
 
 # users.approved: 0 (ожидает), 1 (одобрен), -1 (отклонён)
+
 cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY,
-    approved INTEGER NOT NULL DEFAULT 1  # По умолчанию все одобрены
+    approved INTEGER NOT NULL DEFAULT 1
 )
 """)
+
+# Создаем таблицу configs
 cur.execute("""
 CREATE TABLE IF NOT EXISTS configs (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -582,4 +585,5 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
+
     asyncio.run(main())
