@@ -63,7 +63,14 @@ conn = sqlite3.connect("users.db", check_same_thread=False)
 cur = conn.cursor()
 
 # users.approved: 0 (ожидает), 1 (одобрен), -1 (отклонён)
+# =========================
+# БАЗА ДАННЫХ
+# =========================
+# check_same_thread=False — чтобы использовать соединение в разных обработчиках
+conn = sqlite3.connect("users.db", check_same_thread=False)
+cur = conn.cursor()
 
+# Создаем таблицу users (approved: 0 - ожидает, 1 - одобрен, -1 - отклонён)
 cur.execute("""
 CREATE TABLE IF NOT EXISTS users (
     user_id INTEGER PRIMARY KEY,
@@ -85,7 +92,6 @@ CREATE TABLE IF NOT EXISTS configs (
 )
 """)
 conn.commit()
-
 # Простой стейт для диалогов админа
 ADMIN_PENDING: Dict[int, Dict[str, Any]] = {}
 
@@ -270,6 +276,10 @@ async def cb_user_create(cb: CallbackQuery):
         f"Стоимость 100руб./месяц",
         reply_markup=payments_user(cb.from_user.id)
     )
+@dp.callback_query(F.data.startswith("payments_decline_"))
+async def payments_approve(cb: CallbackQuery):
+    await cb.answer()
+    await cb.message.answer(SUPPORT_TEXT, disable_web_page_preview=True)
 
 @dp.callback_query(F.data.startswith("payments_approve_"))
 async def payments_approve(cb: CallbackQuery):
@@ -585,5 +595,5 @@ async def main():
     await dp.start_polling(bot)
 
 if __name__ == "__main__":
-
     asyncio.run(main())
+
